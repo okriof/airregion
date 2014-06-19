@@ -17,15 +17,15 @@ i=i+1; ad(i,:) = {'MALMÖ', 'ESMM ACC sector 5:6', '128.625', 'FL 285', 'FL 155',
 i=i+1; ad(i,:) = {'MALMÖ', 'ESMM ACC sector 5:7', '128.625', 'FL 285', 'FL 195', '585417N 0143713E - 584448N 0145858E - 583901N 0151046E - 581435N 0140950E - 582730N 0141115E - 583805N 0141606E - 584716N 0142022E - 585417N 0143713E '};
 
 
-i=i+1; ad(i,:) = {'MALMÖ', 'ESMM ACC sector ', '', '', '', ''};
+%i=i+1; ad(i,:) = {'MALMÖ', 'ESMM ACC sector ', '', '', '', ''};
 
+%% disp all regions
+for adid = 1:size(ad,1)
 
-
-
-%% disp region
+% disp region
 load mapmapping
 % ren coords
-ins = ad{6};
+ins = ad{adid,6};
 coordren = ins;
 jj = 1;
 for ii = 1:numel(ins)
@@ -43,3 +43,8 @@ mapp = mapp(1:2,:)./repmat(mapp(3,:),2,1);
 imagesc(im); hold on;
 plot(mapp(1,:), mapp(2,:),'mx-');
 axis image
+title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
+
+pause;
+clf
+end
