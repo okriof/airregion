@@ -86,11 +86,53 @@ i=i+1; ad(i,:) = {'STOCKHOLM', 'ESOS ACC sector N:1', '132.150', 'UNL', 'GND', '
 
 %i=i+1; ad(i,:) = {'STOCKHOLM', 'ESOS ACC sector ', '', 'FL ', 'FL ', ''};
 
-%% disp all regions
-for adid = 1:size(ad,1)
 
-% disp region
+
+%% freqs
+freqs = zeros(size(ad,1),1);
+for adid = 1:size(ad,1)
+    freqs(adid) = str2double(ad{adid,3});
+end
+
 load mapmapping
+unfq = unique(freqs);
+clf
+for fid = 1:numel(unfq)
+    subplot(3,8,fid);
+    imagesc(im); hold on;
+    
+    %clf; imagesc(im); hold on;
+    title(unfq(fid));
+    for adid = 1:size(ad,1)
+        if (str2double(ad{adid,3}) == unfq(fid))
+            ins = ad{adid,6};
+            coordren = ins;
+            jj = 1;
+            for ii = 1:numel(ins)
+                if ((ins(ii) >= '0' && ins(ii) <= '9') || ins(ii) == ' ')
+                    coordren(jj) = ins(ii);
+                    jj = jj + 1;
+                end
+            end
+            coordren = coordren(1:jj-1);
+            coordren = reshape(sscanf(coordren,'%d'), 2, []);
+            % map
+            mapp = H*[coordren; ones(1, size(coordren,2))];
+            mapp = mapp(1:2,:)./repmat(mapp(3,:),2,1);
+            % display
+            plot(mapp(1,:), mapp(2,:),'m-');
+            axis image
+        end
+    end
+    pause
+end
+
+
+%% disp all regions
+clf; imagesc(im); hold on;
+load mapmapping
+
+for adid = size(ad,1):-1:1
 % ren coords
 ins = ad{adid,6};
 coordren = ins;
