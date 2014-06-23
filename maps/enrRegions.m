@@ -173,7 +173,7 @@ end
 load cellposecoords
 for adid = size(ad,1):-1:1
     poses = cellposecoords{adid,1};
-    textcolor = [1 0 1];
+    textcolor = 'magenta';
     for ii = 1:size(poses,1)
         im = insertText(im,poses(ii,:),ad{adid,4}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
         im = insertText(im,poses(ii,:)+diffpose,ad{adid,5}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
