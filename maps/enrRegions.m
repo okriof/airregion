@@ -161,7 +161,8 @@ for adid = size(ad,1):-1:1
     %plot(mapp(1,:), mapp(2,:),'m-');
 
     %im = insertShape(im, 'FilledPolygon', mapp(:).');
-    im = insertShape(im, 'Polygon', mapp(:).', 'Color', 'black', 'LineWidth', 4);
+    %im = insertShape(im, 'Polygon', mapp(:).', 'Color', 'black', 'LineWidth', 4);
+    im = insertShape(im, 'Polygon', mapp(:).', 'Color', 150*[1 1 1], 'LineWidth', 4);
     imagesc(im);
     axis image
     title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
@@ -173,7 +174,8 @@ end
 load cellposecoords
 for adid = size(ad,1):-1:1
     poses = cellposecoords{adid,1};
-    textcolor = 'magenta';
+    %textcolor = 'magenta';
+    textcolor = 'black';
     for ii = 1:size(poses,1)
         im = insertText(im,poses(ii,:),ad{adid,4}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
         im = insertText(im,poses(ii,:)+diffpose,ad{adid,5}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
