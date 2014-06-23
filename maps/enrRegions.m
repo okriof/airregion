@@ -95,13 +95,16 @@ for adid = 1:size(ad,1)
 end
 
 load mapmapping
+im = imread('mapRegions.png');
 unfq = unique(freqs);
 clf
+colorstrs = 'rgbcmyk';
+colori = 1;
 for fid = 1:numel(unfq)
-    subplot(3,8,fid);
-    imagesc(im); hold on;
+    %subplot(3,8,fid);
+    %imagesc(im); hold on;
     
-    %clf; imagesc(im); hold on;
+    clf; imagesc(im); hold on;
     title(unfq(fid));
     for adid = 1:size(ad,1)
         if (str2double(ad{adid,3}) == unfq(fid))
@@ -120,40 +123,130 @@ for fid = 1:numel(unfq)
             mapp = H*[coordren; ones(1, size(coordren,2))];
             mapp = mapp(1:2,:)./repmat(mapp(3,:),2,1);
             % display
-            plot(mapp(1,:), mapp(2,:),'m-');
+            plot(mapp(1,:), mapp(2,:),colorstrs(colori)); colori = colori+1;
+            if (colori > numel(colorstrs))
+                colori = 1;
+            end
             axis image
+            pause
         end
     end
-    pause
+   % pause
 end
 
 
 %% disp all regions
-clf; imagesc(im); hold on;
 load mapmapping
+im = imread('swMapBase.png');
+clf; imagesc(im); hold on;
 
 for adid = size(ad,1):-1:1
-% ren coords
-ins = ad{adid,6};
-coordren = ins;
-jj = 1;
-for ii = 1:numel(ins)
-    if ((ins(ii) >= '0' && ins(ii) <= '9') || ins(ii) == ' ')
-        coordren(jj) = ins(ii);
-        jj = jj + 1;
+    % ren coords
+    ins = ad{adid,6};
+    coordren = ins;
+    jj = 1;
+    for ii = 1:numel(ins)
+        if ((ins(ii) >= '0' && ins(ii) <= '9') || ins(ii) == ' ')
+            coordren(jj) = ins(ii);
+            jj = jj + 1;
+        end
+    end
+    coordren = coordren(1:jj-1);
+    coordren = reshape(sscanf(coordren,'%d'), 2, []);
+    % map
+    mapp = H*[coordren; ones(1, size(coordren,2))];
+    mapp = mapp(1:2,:)./repmat(mapp(3,:),2,1);
+    % display
+    %imagesc(im); hold on;
+    %plot(mapp(1,:), mapp(2,:),'m-');
+
+    %im = insertShape(im, 'FilledPolygon', mapp(:).');
+    im = insertShape(im, 'Polygon', mapp(:).', 'Color', 'black', 'LineWidth', 4);
+    imagesc(im);
+    axis image
+    title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
+
+    %pause;
+    %clf
+end
+
+load cellposecoords
+for adid = size(ad,1):-1:1
+    poses = cellposecoords{adid,1};
+    textcolor = [1 0 1];
+    for ii = 1:size(poses,1)
+        im = insertText(im,poses(ii,:),ad{adid,4}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
+        im = insertText(im,poses(ii,:)+diffpose,ad{adid,5}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
+        im = insertText(im,poses(ii,:)+2*diffpose,ad{adid,3}, 'FontSize', fontsize, 'BoxOpacity', 0, 'TextColor', textcolor);
     end
 end
-coordren = coordren(1:jj-1);
-coordren = reshape(sscanf(coordren,'%d'), 2, []);
-% map
-mapp = H*[coordren; ones(1, size(coordren,2))];
-mapp = mapp(1:2,:)./repmat(mapp(3,:),2,1);
-% display
-imagesc(im); hold on;
-plot(mapp(1,:), mapp(2,:),'mx-');
+clf;
+imagesc(im);
 axis image
-title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
 
-pause;
-clf
+
+
+%% Coordinates for text
+load mapmapping
+im = imread('mapRegions.png');
+clf; imagesc(im); hold on;
+
+%adid = 1;
+cellposecoords = cell(size(ad,1),1);
+
+for adid = 1:size(ad,1) 
+    ins = ad{adid,6};
+    coordren = ins;
+    jj = 1;
+    for ii = 1:numel(ins)
+        if ((ins(ii) >= '0' && ins(ii) <= '9') || ins(ii) == ' ')
+            coordren(jj) = ins(ii);
+            jj = jj + 1;
+        end
+    end
+    coordren = coordren(1:jj-1);
+    coordren = reshape(sscanf(coordren,'%d'), 2, []);
+    % map
+    mapp = H*[coordren; ones(1, size(coordren,2))];
+    mapp = mapp(1:2,:)./repmat(mapp(3,:),2,1);
+    % display
+    imagesc(im); hold on;
+    plot(mapp(1,:), mapp(2,:),'m-');    title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
+    axis equal
+    axis([min(mapp(1,:)) max(mapp(1,:)) min(mapp(2,:)) max(mapp(2,:))])
+    title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
+    
+    printposes = zeros(0,2);
+    nextid = 1;
+    pos = ginput(1);
+    while (numel(pos) == 2)
+       
+        thispose = 0;
+        %pos = ginput(1);
+        while(numel(pos) == 2)
+            thispose = pos;
+            diffpose = [0 14];
+            fontsize = 15;
+            tmpim = insertText(im,thispose,ad{adid,4}, 'FontSize', fontsize, 'BoxOpacity', 0);
+            tmpim = insertText(tmpim,thispose+diffpose,ad{adid,5}, 'FontSize', fontsize, 'BoxOpacity', 0);
+            tmpim = insertText(tmpim,thispose+2*diffpose,ad{adid,3}, 'FontSize', fontsize, 'BoxOpacity', 0);
+            clf; imagesc(tmpim); hold on;
+            plot(mapp(1,:), mapp(2,:),'m-');    title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5}])
+            axis equal
+            axis([min(mapp(1,:)) max(mapp(1,:)) min(mapp(2,:)) max(mapp(2,:))])
+            title([ad{adid,1} ' ' ad{adid,2} ' ' ad{adid,3} ' ' ad{adid,4} ' ' ad{adid,5} ' '])
+            pos = ginput(1);
+        end
+        
+        if (thispose(1) ~= 0)
+            im = tmpim;
+            printposes(nextid,:) = thispose;
+            nextid = nextid + 1;
+        end
+      
+        pos = ginput(1);
+    end
+    cellposecoords{adid,1} = printposes;
+    %pause;
 end
+
